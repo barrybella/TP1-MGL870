@@ -1,0 +1,43 @@
+services:
+  api-a:
+    build: ./api-a
+    container_name: node-api-a
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+      - ./logs:/path/to/your/logs
+  api-b:
+    build: ./api-b
+    container_name: node-api-b
+    ports:
+      - "3002:3002"
+    volumes:
+      - .:/usr/src/app
+      - ./logs:/path/to/your/logs
+   
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config:/etc/loki/config
+    command: -config.file=/etc/loki/config/loki-local-config.yaml
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./promtail-config:/etc/promtail/config
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    command: -config.file=/etc/promtail/config/promtail-config.yaml
+
+
